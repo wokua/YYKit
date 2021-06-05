@@ -438,8 +438,15 @@ typedef NS_ENUM(NSUInteger, YYAnimatedImageType) {
 }
 
 - (void)displayLayer:(CALayer *)layer {
-    if (_curFrame) {
-        layer.contents = (__bridge id)_curFrame.CGImage;
+        UIImage *currentFrame = _curFrame;
+    if (currentFrame) {
+        layer.contentsScale = currentFrame.scale;
+        layer.contents = (__bridge id)currentFrame.CGImage;
+    } else {
+        // If we have no animation frames, call super implementation. iOS 14+ UIImageView use this delegate method for rendering.
+        if ([UIImageView instancesRespondToSelector:@selector(displayLayer:)]) {
+            [super displayLayer:layer];
+        }
     }
 }
 
